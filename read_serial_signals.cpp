@@ -28,7 +28,7 @@ namespace fs = std::filesystem;
  *     RI  - Ring Indicator      - UPS Utility Fail
  *     DSR - Data Set Ready      - UPS Bypass
  */
-int readSerialPortControlSignals(char *device, int *upsSignals) {
+int readSerialPortControlSignals(char *device, int &upsSignals) {
   if (0 != access(device, R_OK)) {
     cerr << "The device does not have read access, " << device << "\n";
     return -1; // let the caller check errno
@@ -74,7 +74,7 @@ int readSerialPortControlSignals(char *device, int *upsSignals) {
 
   // only keep the 4 (bits) Signals we are intrested in
   modemControlBits &= (TIOCM_CTS | TIOCM_CAR | TIOCM_RNG | TIOCM_DSR);
-  *upsSignals = modemControlBits;
+  upsSignals = modemControlBits;
   return 0;
 }
 
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
   int myUpsSignals;
   int result;
-  result = readSerialPortControlSignals(argv[1], &myUpsSignals);
+  result = readSerialPortControlSignals(argv[1], myUpsSignals);
 
   switch (result) {
   case 0:
